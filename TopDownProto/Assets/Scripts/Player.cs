@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerController))]
+[RequireComponent(typeof(GunController))]
 public class Player : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -11,9 +12,12 @@ public class Player : MonoBehaviour
 
     Camera viewCamera;
     PlayerController playerController;
+
+    GunController gunController;
     void Start()
     {
         playerController = GetComponent<PlayerController>();
+        gunController = GetComponent<GunController>();
         viewCamera = Camera.main;
     }
 
@@ -33,6 +37,11 @@ public class Player : MonoBehaviour
            Vector3 point = ray.GetPoint(rayDistance);
             Debug.DrawLine(ray.origin, point, Color.red);
             playerController.LookAt(point);
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            gunController.Shoot();
         }
     }
 }
