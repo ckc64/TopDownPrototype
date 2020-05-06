@@ -4,29 +4,123 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Enemy : MonoBehaviour
-{
+public class Enemy : LivingEntity
+{   
+
+    public enum State { Idle, Chasing, Attacking};
+    State currentState;
     NavMeshAgent pathFinder;
     Transform target;
-    void Start()
+    LivingEntity playerEntity;
+
+    Material skinMaterial;
+
+    Color originalColor;
+
+    float attackDistanceThreshold = .5f;
+    float timeBeetweenAttacks = 1;
+    float damage = 1;
+    float nextAttackTime;
+    float collisionRadius;
+    float playerCollisionRadius;
+
+    bool hasTarget;
+    protected override void Start()
     {
+        base.Start();
         pathFinder = GetComponent<NavMeshAgent>();
-        target = GameObject.FindGameObjectWithTag("Player").transform;
+        skinMaterial = GetComponent<Renderer>().material;
+        originalColor = skinMaterial.color;
+        
+        if(GameObject.FindGameObjectWithTag("Player") != null)
+        {
+            currentState = State.Chasing;
+            hasTarget = true;
+            target = GameObject.FindGameObjectWithTag("Player").transform;
+            playerEntity = target.GetComponent<LivingEntity>();
+            playerEntity.OnDeath += OnTargetDeath;
+
+            collisionRadius = GetComponent<CapsuleCollider>().radius;
+            playerCollisionRadius = GetComponent<CapsuleCollider>().radius;
+
+            StartCoroutine(UpdatePath());
+        }
+        
     }
 
+    void OnTargetDeath()
+    {
+        hasTarget = false;
+        currentState = State.Idle;
+    }
     // Update is called once per frame
     void Update()
     {
-        StartCoroutine(UpdatePath());
+        if (hasTarget)
+        {
+            if (Time.time > nextAttackTime)
+            {
+                float sqrDistanceToTarget = (target.position - transform.position).sqrMagnitude;
+                if (sqrDistanceToTarget < Mathf.Pow(attackDistanceThreshold + collisionRadius + playerCollisionRadius, 2))
+                {
+                    nextAttackTime = Time.time + timeBeetweenAttacks;
+                    StartCoroutine(Attack());
+                }
+            }
+        } 
+    }
+
+    IEnumerator Attack()
+    {
+        currentState = State.Attacking;
+        pathFinder.enabled = false;
+        Vector3 currentPosition = transform.position;
+
+        Vector3 directionToTarget = (target.position - transform.position).normalized;
+        Vector3 attackPosition = target.position - directionToTarget * (collisionRadius);
+     
+
+        float percent = 0;
+        float attackSpeed = 3;
+
+        skinMaterial.color = Color.red;
+        bool hasAppliedDamage = false;
+        while(percent <= 1)
+        {
+
+            if(percent >= .5f && !hasAppliedDamage)
+            {
+                hasAppliedDamage = true;
+                playerEntity.TakeDamage(damage);
+            }
+
+            percent += Time.deltaTime * attackSpeed;
+            float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
+            transform.position = Vector3.Lerp(currentPosition, attackPosition, interpolation);
+
+            yield return null;
+        }
+        skinMaterial.color = originalColor;
+        currentState = State.Chasing;
+        pathFinder.enabled = true;
     }
 
     IEnumerator UpdatePath()
     {
         
-        while(target != null)
+        while(hasTarget)
         {
-            Vector3 targetPosition = new Vector3(target.position.x, 0, target.position.z);
-            pathFinder.SetDestination(targetPosition);
+            if(currentState == State.Chasing)
+            {
+                Vector3 directionToTarget = (target.position - transform.position).normalized;
+                Vector3 targetPosition = target.position - directionToTarget * (collisionRadius + playerCollisionRadius + attackDistanceThreshold/2);
+                if (!dead)
+                {
+                    pathFinder.SetDestination(targetPosition);
+                }
+            }
+           
+            
             yield return new WaitForSeconds(0.25f);
         }
     }

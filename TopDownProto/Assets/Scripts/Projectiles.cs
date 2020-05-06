@@ -7,6 +7,20 @@ public class Projectiles : MonoBehaviour
 
     float speed = 10;
     public LayerMask collisionMask;
+    float damage = 1;
+
+    float bulletLifeTime = 3;
+    float skinWidth = .1f;
+    void Start()
+    {
+        Destroy(gameObject, bulletLifeTime);
+
+        Collider[] initialCollisions = Physics.OverlapSphere(transform.position, .1f, collisionMask);
+        if(initialCollisions.Length > 0)
+        {
+            OnHitObject(initialCollisions[0]);
+        }
+    }
 
     public void newProjectileSpeed(float newSpeed)
     {
@@ -17,6 +31,7 @@ public class Projectiles : MonoBehaviour
     void Update()
     {
         float movementDistance = speed * Time.deltaTime;
+        CheckCollisions(movementDistance);
         transform.Translate(Vector3.forward * movementDistance);
     }
 
@@ -24,7 +39,7 @@ public class Projectiles : MonoBehaviour
     {
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit hit;
-        if(Physics.Raycast(ray, out hit,movementDistance,collisionMask, QueryTriggerInteraction.Collide))
+        if(Physics.Raycast(ray, out hit,movementDistance+skinWidth,collisionMask, QueryTriggerInteraction.Collide))
         {
             OnHitObject(hit);
         }
@@ -32,9 +47,25 @@ public class Projectiles : MonoBehaviour
 
     void OnHitObject(RaycastHit hit)
     {
+        IDamageable damageable = hit.collider.GetComponent<IDamageable>();
+       
         
-            GameObject.Destroy(gameObject);
-        
-            
+        if(damageable != null)
+        {
+            damageable.TakeHit(damage, hit);
+        }
+        GameObject.Destroy(gameObject);
+    }
+
+    void OnHitObject(Collider c)
+    {
+        IDamageable damageable = c.GetComponent<IDamageable>();
+
+
+        if (damageable != null)
+        {
+            damageable.TakeDamage(damage);
+        }
+        GameObject.Destroy(gameObject);
     }
 }
