@@ -102,7 +102,7 @@ public class Spawner : MonoBehaviour
 
     void ResetPlayerPosition()
     {
-        playerTransform.position = Vector3.up * 2;
+        playerTransform.position = Vector3.zero + Vector3.up*3;
     }
 
     void NextWave()

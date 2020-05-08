@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
 public class LivingEntity : MonoBehaviour, IDamageable
@@ -15,13 +14,13 @@ public class LivingEntity : MonoBehaviour, IDamageable
     {
         health = startingHealth;
     }
-    public void TakeHit(float damage, RaycastHit hit)
+    public virtual void TakeHit(float damage,Vector3 hitPoint, Vector3 hitDirection)
     {
-        Debug.Log(hit.collider.gameObject.name);
+       // Debug.Log(hit.collider.gameObject.name);
         TakeDamage(damage);
     }
 
-    public void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage)
     {
         
         health -= damage;
@@ -31,6 +30,7 @@ public class LivingEntity : MonoBehaviour, IDamageable
         }
     }
 
+    [ContextMenu("Self Destruct")]
     protected void Die()
     {
         dead = true;

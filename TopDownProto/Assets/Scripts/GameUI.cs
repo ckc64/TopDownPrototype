@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class GameUI : MonoBehaviour
 {
@@ -8,9 +9,9 @@ public class GameUI : MonoBehaviour
     public Image fadeCanvas;
     public GameObject gameOverUI;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        FindObjectOfType<Player>().OnDeath += OnGameOver;
+       FindObjectOfType<Player>().OnDeath += OnGameOver;
 
     }
 
@@ -31,5 +32,12 @@ public class GameUI : MonoBehaviour
             fadeCanvas.color = Color.Lerp(from, to, percent);
             yield return null;
         }
+    }
+
+    //UI(Button)
+
+    public void StartNewGame()
+    {
+        SceneManager.LoadScene(0);
     }
 }

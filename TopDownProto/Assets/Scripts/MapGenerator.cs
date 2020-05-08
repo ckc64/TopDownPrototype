@@ -32,13 +32,11 @@ public class MapGenerator : MonoBehaviour
     //variable for saving tiles
     Transform[,] tileMap;
 
-
-    void Start()
-{
-
-
+  void Awake()
+    {
         FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
-}
+    }
+
 
     void OnNewWave(int waveNumber)
     {
@@ -136,12 +134,13 @@ public void GenerateMap()
     maskRight.localScale = new Vector3((maximumMapSize.x - currentMap.mapSize.x) / 2f, 1, currentMap.mapSize.y) * tileSize;
 
     //----
-    Transform maskTop = Instantiate(navMeshMaskPrefab, Vector3.forward * (currentMap.mapSize.x + maximumMapSize.x) / 4f * tileSize, Quaternion.identity) as Transform;
+    Transform maskTop = Instantiate(navMeshMaskPrefab, (Vector3.forward * (currentMap.mapSize.x + maximumMapSize.x) / 4f * tileSize) , Quaternion.identity) as Transform;
     maskTop.parent = mapHolder;
     maskTop.localScale = new Vector3((maximumMapSize.x) / 2f, 1, (maximumMapSize.y- currentMap.mapSize.y)/2f) * tileSize;
-
-    //----
-    Transform maskBottom = Instantiate(navMeshMaskPrefab, Vector3.back * (currentMap.mapSize.x + maximumMapSize.x) / 4f * tileSize, Quaternion.identity) as Transform;
+        Debug.Log(Vector3.forward * (currentMap.mapSize.x + maximumMapSize.x) / 4f * tileSize);
+        
+        //----
+        Transform maskBottom = Instantiate(navMeshMaskPrefab, Vector3.back * (currentMap.mapSize.x + maximumMapSize.x) / 4f * tileSize, Quaternion.identity) as Transform;
     maskBottom.parent = mapHolder;
     maskBottom.localScale = new Vector3((maximumMapSize.x) / 2f, 1, (maximumMapSize.y - currentMap.mapSize.y) / 2f) * tileSize;
 
@@ -197,8 +196,8 @@ Vector3 CoordToPosition(int x,int y)
     {
         //position = ((-mapsize/2)+(1/2)+x)*tileSize
         //x = ((position/tileSize) + (mapSize-1)/2)
-        int x = Mathf.RoundToInt(position.x / tileSize + (currentMap.mapSize.x - 1) / 2)+2;
-        int y = Mathf.RoundToInt(position.z / tileSize + (currentMap.mapSize.y - 1) / 2)+2;
+        int x = Mathf.RoundToInt(position.x / tileSize + (currentMap.mapSize.x - 1) / 2 ) + 2;
+        int y = Mathf.RoundToInt(position.z / tileSize + (currentMap.mapSize.y - 1) / 2 ) + 2;
         x = Mathf.Clamp(x,0, tileMap.GetLength(0)-1);
         y = Mathf.Clamp(y, 0, tileMap.GetLength(1)-1);
         return tileMap[x, y];
