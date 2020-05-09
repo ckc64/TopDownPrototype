@@ -9,7 +9,17 @@ public class Gun : MonoBehaviour
     public float millisecondsBetweenShots = 100;
     public float muzzleVelocity = 35;
 
+    public Transform shell;
+    public Transform shellEjection;
+
+    MuzzleFlash muzzleFlash;
+
     float nextShotTime;
+
+    void Start()
+    {
+        muzzleFlash = GetComponent<MuzzleFlash>();
+    }
     public void Shoot()
     {
         if(Time.time > nextShotTime)
@@ -17,6 +27,9 @@ public class Gun : MonoBehaviour
             nextShotTime = Time.time + millisecondsBetweenShots / 1000;
             Projectiles newProjectiles = Instantiate(projectiles, muzzle.position, muzzle.rotation) as Projectiles;
             newProjectiles.newProjectileSpeed(muzzleVelocity);
+
+            Instantiate(shell, shellEjection.position, shellEjection.rotation);
+            muzzleFlash.Activate();
         }
         
     }

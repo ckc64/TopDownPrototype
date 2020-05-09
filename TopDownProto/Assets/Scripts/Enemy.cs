@@ -78,6 +78,7 @@ public class Enemy : LivingEntity
                 if (sqrDistanceToTarget < Mathf.Pow(attackDistanceThreshold + collisionRadius + playerCollisionRadius, 2))
                 {
                     nextAttackTime = Time.time + timeBeetweenAttacks;
+                    
                     StartCoroutine(Attack());
                 }
             }

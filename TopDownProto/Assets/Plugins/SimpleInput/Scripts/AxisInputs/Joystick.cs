@@ -8,8 +8,8 @@ namespace SimpleInputNamespace
 	{
 		public enum MovementAxes { XandY, X, Y };
 
-		public SimpleInput.AxisInput xAxis = new SimpleInput.AxisInput( "Horizontal" );
-		public SimpleInput.AxisInput yAxis = new SimpleInput.AxisInput( "Vertical" );
+		public SimpleInput.AxisInput xAxis = new SimpleInput.AxisInput("Horizontal");
+		public SimpleInput.AxisInput yAxis = new SimpleInput.AxisInput("Vertical");
 
 		private RectTransform joystickTR;
 		private Graphic background;
@@ -17,7 +17,7 @@ namespace SimpleInputNamespace
 		public MovementAxes movementAxes = MovementAxes.XandY;
 		public float valueMultiplier = 1f;
 
-		
+
 #pragma warning disable 0649
 		[SerializeField]
 		private Image thumb;
@@ -51,17 +51,17 @@ namespace SimpleInputNamespace
 
 		private void Awake()
 		{
-			joystickTR = (RectTransform) transform;
+			joystickTR = (RectTransform)transform;
 			thumbTR = thumb.rectTransform;
 
 			Graphic bgGraphic = GetComponent<Graphic>();
-			if( bgGraphic )
+			if (bgGraphic)
 			{
 				background = bgGraphic;
 				background.raycastTarget = false;
 			}
 
-			if( isDynamicJoystick )
+			if (isDynamicJoystick)
 			{
 				opacity = 0f;
 				thumb.raycastTarget = false;
@@ -81,17 +81,16 @@ namespace SimpleInputNamespace
 		private void Start()
 		{
 			SimpleInputDragListener eventReceiver;
-			if( !isDynamicJoystick )
+			if (!isDynamicJoystick)
 				eventReceiver = thumbTR.gameObject.AddComponent<SimpleInputDragListener>();
 			else
 			{
-				if( !dynamicJoystickMovementArea )
+				if (!dynamicJoystickMovementArea)
 				{
 					dynamicJoystickMovementArea = new GameObject("Dynamic Joystick Movement Area", typeof(RectTransform)).GetComponent<RectTransform>();
 
-					
-					
-					dynamicJoystickMovementArea.SetParent( thumb.canvas.transform, true );
+					dynamicJoystickMovementArea.SetParent(thumb.canvas.transform, true);
+
 					dynamicJoystickMovementArea.SetAsFirstSibling();
 					dynamicJoystickMovementArea.anchorMin = Vector2.zero;
 					dynamicJoystickMovementArea.anchorMax = Vector2.one;
@@ -105,6 +104,7 @@ namespace SimpleInputNamespace
 			eventReceiver.Listener = this;
 		}
 
+		
 		private void OnEnable()
 		{
 			xAxis.StartTracking();
@@ -180,7 +180,8 @@ namespace SimpleInputNamespace
 
 		private void OnUpdate()
 		{
-			if( !isDynamicJoystick )
+			
+			if ( !isDynamicJoystick )
 				return;
 
 			if( joystickHeld )
