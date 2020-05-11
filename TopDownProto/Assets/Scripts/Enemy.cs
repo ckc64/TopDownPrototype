@@ -28,23 +28,36 @@ public class Enemy : LivingEntity
     float playerCollisionRadius;
 
     bool hasTarget;
-    protected override void Start()
+
+    private void Awake()
     {
-        base.Start();
         pathFinder = GetComponent<NavMeshAgent>();
-        skinMaterial = GetComponent<Renderer>().material;
-        originalColor = skinMaterial.color;
-        
-        if(GameObject.FindGameObjectWithTag("Player") != null)
+       
+        if (GameObject.FindGameObjectWithTag("Player") != null)
         {
-            currentState = State.Chasing;
+           
             hasTarget = true;
             target = GameObject.FindGameObjectWithTag("Player").transform;
             playerEntity = target.GetComponent<LivingEntity>();
-            playerEntity.OnDeath += OnTargetDeath;
+          
 
             collisionRadius = GetComponent<CapsuleCollider>().radius;
             playerCollisionRadius = GetComponent<CapsuleCollider>().radius;
+
+          
+        }
+    }
+    protected override void Start()
+    {
+        base.Start();
+   
+      
+        
+        if(hasTarget)
+        {
+            currentState = State.Chasing;
+           
+            playerEntity.OnDeath += OnTargetDeath;
 
             StartCoroutine(UpdatePath());
         }
@@ -93,17 +106,17 @@ public class Enemy : LivingEntity
 
         Vector3 directionToTarget = (target.position - transform.position).normalized;
         Vector3 attackPosition = target.position - directionToTarget * (collisionRadius);
-     
+
 
         float percent = 0;
         float attackSpeed = 3;
 
         skinMaterial.color = Color.red;
         bool hasAppliedDamage = false;
-        while(percent <= 1)
+        while (percent <= 1)
         {
 
-            if(percent >= .5f && !hasAppliedDamage)
+            if (percent >= .5f && !hasAppliedDamage)
             {
                 hasAppliedDamage = true;
                 playerEntity.TakeDamage(damage);
@@ -120,6 +133,19 @@ public class Enemy : LivingEntity
         pathFinder.enabled = true;
     }
 
+
+    public void SetCharacteristics(float moveSpeed, int hitsToKillPlayer, float enemyHealth, Color skinColor)
+    {
+        pathFinder.speed = moveSpeed;
+        if (hasTarget)
+        {
+            damage = Mathf.Ceil(playerEntity.startingHealth / hitsToKillPlayer);
+        }
+        startingHealth = enemyHealth;
+        skinMaterial = GetComponent<Renderer>().material;
+        skinMaterial.color = skinColor;
+        originalColor = skinMaterial.color;
+    }
     IEnumerator UpdatePath()
     {
         

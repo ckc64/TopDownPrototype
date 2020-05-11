@@ -9,6 +9,7 @@ public class Projectiles : MonoBehaviour
     public LayerMask collisionMask;
     float damage = 1;
 
+    public Color trailColor;
     float bulletLifeTime = 3;
     float skinWidth = .1f;
     void Start()
@@ -20,6 +21,8 @@ public class Projectiles : MonoBehaviour
         {
             OnHitObject(initialCollisions[0], transform.position) ;
         }
+
+        GetComponent<TrailRenderer>().material.SetColor("_TintColor_", trailColor);
     }
 
     public void newProjectileSpeed(float newSpeed)

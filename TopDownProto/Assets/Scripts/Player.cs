@@ -11,7 +11,8 @@ public class Player : LivingEntity
     // Start is called before the first frame update
 
     public float moveSpeed = 5;
-    
+
+    public Crosshair crosshair;
     Camera viewCamera;
     PlayerController playerController;
     private Enemy closestEnemy;
@@ -25,14 +26,15 @@ public class Player : LivingEntity
         base.Start();
         playerController = GetComponent<PlayerController>();
         gunController = GetComponent<GunController>();
-        
-       
+      
         viewCamera = Camera.main;
     }
 
     // Update is called once per frame
     void Update()
     {
+
+        crosshair.ActivateCrosshair(false);
         closestEnemy = null;
         allEnemies = GameObject.FindObjectsOfType<Enemy>();
         distanceClosestToEnemy = Mathf.Infinity;
@@ -42,7 +44,7 @@ public class Player : LivingEntity
         playerController.Move(moveVelocity);
         Debug.Log(thumb.transform.position);
         Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        Plane groundPlane = new Plane(Vector3.up, Vector3.up * gunController.GunHeight);
         float rayDistance;
 
         if(groundPlane.Raycast(ray,out rayDistance))
@@ -60,18 +62,25 @@ public class Player : LivingEntity
                 distanceClosestToEnemy= distanceToEnemy;
                 closestEnemy = currentEnemy;
                 //Debug.Log(distanceClosestToEnemy);
-                if (distanceClosestToEnemy < 40)
+               
+                if (distanceClosestToEnemy < 25)
                 {
+                    crosshair.ActivateCrosshair(true);
+                    crosshair.DetectTargets(ray);
                     playerController.LookAt(closestEnemy.transform.position);
+                    
+                    crosshair.transform.position = closestEnemy.transform.position;
                     gunController.Shoot();
+                  
+                    
                 }
             }
         }
         
           
-       // if (Input.GetMouseButton(0))
-        //{
-            //gunController.Shoot();
-        //}
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            gunController.Shoot();
+        }
     }
 }

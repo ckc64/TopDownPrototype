@@ -9,7 +9,7 @@ public class MapGenerator : MonoBehaviour
     // transfer to Map Class public Vector2 mapSize;
     public Vector2 maximumMapSize;
     public Transform mapFloor;
-    
+    public Transform currentMapFloor;
     public float outlinePercent;
 
     /* transfer to Map Class [Range(0,1)]
@@ -49,7 +49,7 @@ public void GenerateMap()
         currentMap = maps[mapIndex];
         tileMap = new Transform[currentMap.mapSize.x, currentMap.mapSize.y];
         System.Random randomIndex = new System.Random(currentMap.seed);
-        GetComponent<BoxCollider>().size = new Vector3(currentMap.mapSize.x * tileSize, .05f, currentMap.mapSize.y * tileSize);
+      
         //Generate Coords
     allTileCoords = new List<Coord>();
     for (int x = 0; x < currentMap.mapSize.x; x++)
@@ -146,7 +146,8 @@ public void GenerateMap()
 
     //navmeshfloor
     mapFloor.localScale = new Vector3(maximumMapSize.x, maximumMapSize.y) * tileSize;
-}
+        currentMapFloor.localScale = new Vector3(currentMap.mapSize.x * tileSize, currentMap.mapSize.y * tileSize);
+    }
 
 bool MapIsAccesible(bool[,] obstacleMap, int currentObstacleCount)
 {
